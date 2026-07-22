@@ -15,6 +15,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # unlike keys, this project has a dependency (qrcode-generator) that the
+      # functions bundler has to resolve at build time. without this the deploy
+      # fails with 'could not resolve "qrcode-generator"'.
+      - name: install deps
+        run: npm ci
       - name: deploy to cloudflare pages
         run: npx wrangler@latest pages deploy public --project-name card --branch main --commit-dirty=true
         env:
