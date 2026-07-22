@@ -1,0 +1,10 @@
+{
+  "name": "card",
+  "version": "1.0.0",
+  "description": "digital business card for hartforge.dev",
+  "type": "module",
+  "dependencies": {
+    "qrcode-generator": "^2.0.4"
+  },
+  "private": true
+}
