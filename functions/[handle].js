@@ -51,7 +51,7 @@ export async function onRequestGet(context) {
 
   const links = person.links
     .map((l) => `<a href="${escapeHtml(l.url)}" rel="me noopener">${escapeHtml(l.label)}</a>`)
-    .join('<span class="dot-sep">·</span>');
+    .join("\n      ");
 
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -78,7 +78,10 @@ export async function onRequestGet(context) {
     text-align: center;
   }
   .card > * { min-width: 0; }
-  .who { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+  /* NOT .who - hartforge.css defines that as display:flex, which left-aligns
+     its content and ignores the inherited text-align. design-system class
+     names are reserved; prefix anything local. */
+  .card-name { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
   .role { color: var(--muted, #8b909a); font-size: 0.95rem; overflow-wrap: anywhere; }
   .qrwrap { background: #fff; padding: 10px; border-radius: 10px; line-height: 0;
             justify-self: center; }
@@ -95,11 +98,14 @@ export async function onRequestGet(context) {
   /* one visual priority only - "add to contacts" is the point of the page */
   .act.primary { border-color: #ff6a1f; color: #ff6a1f; }
   .act.primary:hover { background: #ff6a1f; color: #0f1113; }
-  .secondary { font-size: 0.82rem; opacity: 0.75; line-height: 2;
-               max-width: 100%; overflow-wrap: anywhere; }
+  /* flex + gap rather than inline separators: a wrapped inline row can end a
+     line on a dangling "·", which is what happened at 390px. */
+  .secondary { display: flex; flex-wrap: wrap; justify-content: center;
+               gap: 0.25rem 0.9rem; font-size: 0.82rem; opacity: 0.75;
+               max-width: 100%; }
   .secondary a { color: inherit; text-decoration: none; border-bottom: 1px solid #2a2e36; }
   .secondary a:hover { color: #ff6a1f; border-color: #ff6a1f; }
-  .dot-sep { opacity: 0.4; margin: 0 0.5rem; }
+
 </style>
 </head><body><div class="page">
 <div class="banner">
@@ -109,7 +115,7 @@ export async function onRequestGet(context) {
 
 <div class="sec card">
   <div>
-    <div class="who">${escapeHtml(person.name)}</div>
+    <div class="card-name">${escapeHtml(person.name)}</div>
     <div class="role">${escapeHtml(person.role)}</div>
     <div class="loc">${escapeHtml(person.locality)}, ${escapeHtml(person.region)}</div>
   </div>
