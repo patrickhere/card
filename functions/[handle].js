@@ -64,15 +64,24 @@ export async function onRequestGet(context) {
   /* one screen, no scroll. this page gets held up on a phone, so the qr and
      the add-to-contacts button are the only things that must never be below
      the fold. */
-  .card { display: grid; gap: 1.25rem; justify-items: center; text-align: center; }
-  /* justify-items:center sizes each grid child to its MAX-CONTENT width, so a
-     long line does not wrap - it overflows the page and the phone scrolls
-     sideways. constrain every child back to the container and let text wrap.
-     min-width:0 is the flex/grid equivalent for the button row. */
-  .card > * { max-width: 100%; min-width: 0; }
+  /* the column is minmax(0,1fr), NOT the default auto.
+     an implicit auto track sizes to max-content - as wide as the widest child -
+     so children then overflow the page while faithfully filling that track.
+     putting max-width:100% on the children does nothing, because 100% resolves
+     against the oversized track. the constraint has to be on the track itself.
+     centring is done with text-align + justify-self, never justify-items,
+     which would re-introduce max-content sizing. */
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    text-align: center;
+  }
+  .card > * { min-width: 0; }
   .who { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
   .role { color: var(--muted, #8b909a); font-size: 0.95rem; overflow-wrap: anywhere; }
-  .qrwrap { background: #fff; padding: 10px; border-radius: 10px; line-height: 0; }
+  .qrwrap { background: #fff; padding: 10px; border-radius: 10px; line-height: 0;
+            justify-self: center; }
   .qr { width: min(46vw, 190px); height: auto; }
   .loc { color: var(--muted, #8b909a); font-size: 0.85rem; margin-top: 0.15rem; }
   .acts { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
