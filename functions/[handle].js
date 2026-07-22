@@ -65,12 +65,18 @@ export async function onRequestGet(context) {
      the add-to-contacts button are the only things that must never be below
      the fold. */
   .card { display: grid; gap: 1.25rem; justify-items: center; text-align: center; }
+  /* justify-items:center sizes each grid child to its MAX-CONTENT width, so a
+     long line does not wrap - it overflows the page and the phone scrolls
+     sideways. constrain every child back to the container and let text wrap.
+     min-width:0 is the flex/grid equivalent for the button row. */
+  .card > * { max-width: 100%; min-width: 0; }
   .who { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
-  .role { color: var(--muted, #8b909a); font-size: 0.95rem; }
+  .role { color: var(--muted, #8b909a); font-size: 0.95rem; overflow-wrap: anywhere; }
   .qrwrap { background: #fff; padding: 10px; border-radius: 10px; line-height: 0; }
   .qr { width: min(46vw, 190px); height: auto; }
   .loc { color: var(--muted, #8b909a); font-size: 0.85rem; margin-top: 0.15rem; }
-  .acts { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+  .acts { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+          max-width: 100%; }
   .act {
     display: inline-block; padding: 0.55rem 1rem; border-radius: 8px;
     border: 1px solid #2a2e36; color: inherit; text-decoration: none;
@@ -80,7 +86,8 @@ export async function onRequestGet(context) {
   /* one visual priority only - "add to contacts" is the point of the page */
   .act.primary { border-color: #ff6a1f; color: #ff6a1f; }
   .act.primary:hover { background: #ff6a1f; color: #0f1113; }
-  .secondary { font-size: 0.82rem; opacity: 0.75; line-height: 2; }
+  .secondary { font-size: 0.82rem; opacity: 0.75; line-height: 2;
+               max-width: 100%; overflow-wrap: anywhere; }
   .secondary a { color: inherit; text-decoration: none; border-bottom: 1px solid #2a2e36; }
   .secondary a:hover { color: #ff6a1f; border-color: #ff6a1f; }
   .dot-sep { opacity: 0.4; margin: 0 0.5rem; }
