@@ -41,12 +41,17 @@ export async function onRequestGet(context) {
   }
 
   const cardUrl = `${origin}/${person.handle}`;
+
+  // primary actions are what someone scanning this card came for. everything
+  // else is proof and provenance, kept quieter so the card does not turn into
+  // a link dump - /links on the main site is the directory.
+  const primary = (person.primary || [])
+    .map((l) => `<a class="act" href="${escapeHtml(l.url)}">${escapeHtml(l.label)}</a>`)
+    .join("\n      ");
+
   const links = person.links
-    .map(
-      (l) =>
-        `<li><span class="arw">-&gt;</span><a href="${escapeHtml(l.url)}" rel="me noopener">${escapeHtml(l.label)}</a></li>`
-    )
-    .join("\n");
+    .map((l) => `<a href="${escapeHtml(l.url)}" rel="me noopener">${escapeHtml(l.label)}</a>`)
+    .join('<span class="dot-sep">·</span>');
 
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -64,14 +69,21 @@ export async function onRequestGet(context) {
   .role { color: var(--muted, #8b909a); font-size: 0.95rem; }
   .qrwrap { background: #fff; padding: 10px; border-radius: 10px; line-height: 0; }
   .qr { width: min(46vw, 190px); height: auto; }
-  .vcf {
-    display: inline-block; padding: 0.6rem 1.1rem; border-radius: 8px;
-    border: 1px solid #ff6a1f; color: #ff6a1f; text-decoration: none;
-    font-weight: 600; font-size: 0.95rem;
+  .loc { color: var(--muted, #8b909a); font-size: 0.85rem; margin-top: 0.15rem; }
+  .acts { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+  .act {
+    display: inline-block; padding: 0.55rem 1rem; border-radius: 8px;
+    border: 1px solid #2a2e36; color: inherit; text-decoration: none;
+    font-weight: 600; font-size: 0.9rem;
   }
-  .vcf:hover { background: #ff6a1f; color: #0f1113; }
-  .rows { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
-  .arw { opacity: 0.5; margin-right: 0.5rem; }
+  .act:hover { border-color: #ff6a1f; color: #ff6a1f; }
+  /* one visual priority only - "add to contacts" is the point of the page */
+  .act.primary { border-color: #ff6a1f; color: #ff6a1f; }
+  .act.primary:hover { background: #ff6a1f; color: #0f1113; }
+  .secondary { font-size: 0.82rem; opacity: 0.75; line-height: 2; }
+  .secondary a { color: inherit; text-decoration: none; border-bottom: 1px solid #2a2e36; }
+  .secondary a:hover { color: #ff6a1f; border-color: #ff6a1f; }
+  .dot-sep { opacity: 0.4; margin: 0 0.5rem; }
 </style>
 </head><body><div class="page">
 <div class="banner">
@@ -83,13 +95,17 @@ export async function onRequestGet(context) {
   <div>
     <div class="who">${escapeHtml(person.name)}</div>
     <div class="role">${escapeHtml(person.role)}</div>
+    <div class="loc">${escapeHtml(person.locality)}, ${escapeHtml(person.region)}</div>
   </div>
 
   <div class="qrwrap">${qrSvg(cardUrl)}</div>
 
-  <a class="vcf" href="/${escapeHtml(person.handle)}.vcf">add to contacts</a>
+  <div class="acts">
+      <a class="act primary" href="/${escapeHtml(person.handle)}.vcf">add to contacts</a>
+      ${primary}
+  </div>
 
-  <ul class="rows">${links}</ul>
+  <div class="secondary">${links}</div>
 
   <p class="tagline">${escapeHtml(person.tagline)}</p>
 </div>
