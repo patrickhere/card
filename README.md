@@ -4,8 +4,9 @@ digital business cards for hartforge.dev. sibling to `keys` - same cloudflare
 pages + functions pattern, same design system, same `/<handle>` shape, so the
 two read as one system rather than two one-offs.
 
-status: **built and tested locally, not deployed.** deploy needs patrick's
-go-ahead (creates a pages project + dns record).
+status: **live** at card.hartforge.dev. deploys on push via forgejo mirror ->
+github -> pages action. editing `functions/_people.js` and pushing is the whole
+workflow (re-run `node tools/gen-og.mjs` too when a rendered field changes).
 
 ## routes
 
@@ -14,6 +15,27 @@ go-ahead (creates a pages project + dns record).
 | `/` | index of cards |
 | `/patrick` | the card - one screen, qr, add-to-contacts |
 | `/patrick.vcf` | vcard 3.0, `Content-Disposition: attachment` |
+| `/og/patrick.png` | the social-preview image (static, from `tools/gen-og.mjs`) |
+
+## link previews (imessage, slack, etc)
+
+`[handle].js` emits open graph + twitter-card meta so a shared link renders as a
+rich card instead of bare text. the piece that matters is `og:image`: without
+it, imessage shows nothing.
+
+that image is a **static PNG per person**, `public/og/<handle>.png`, rendered by
+`tools/gen-og.mjs` (headless chrome, forge palette, 2400x1260). it is committed,
+not built in CI, so the deploy needs no chrome and the image only changes when
+the person's fields do. regenerate after editing `_people.js`:
+
+```sh
+node tools/gen-og.mjs
+```
+
+static and not a worker-rendered image on purpose: preview scrapers want a plain
+PNG at a stable url and mis-handle SVG, and a card's fields change ~never, so a
+per-request rasterizer would buy nothing. the `og:image:width/height` in
+`[handle].js` must match what the script renders (2x -> 2400x1260).
 
 ## decisions worth keeping
 
