@@ -73,11 +73,11 @@ for (const p of Object.values(people)) {
   const tmp = join(tmpdir(), `og-${p.handle}.html`);
   writeFileSync(tmp, template(p));
   const out = join(OUTDIR, `${p.handle}.png`);
-  // scale-factor 2 -> a 2400x1260 file for a crisp preview on retina. the
+  // scale-factor 2 -> a 1200x630 file for a crisp preview on retina. the
   // og:image:width/height in [handle].js must match these actual dimensions.
   execFileSync(
     CHROME,
-    ["--headless", "--disable-gpu", "--force-device-scale-factor=2",
+    ["--headless", "--disable-gpu", "--force-device-scale-factor=1",
      "--hide-scrollbars", "--window-size=1200,630",
      `--screenshot=${out}`, `file://${tmp}`],
     { stdio: "ignore" }

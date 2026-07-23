@@ -45,7 +45,13 @@ export async function onRequestGet(context) {
   // link-preview metadata (imessage, slack, twitter, etc). the og:image is the
   // whole point of the request - without it a shared link renders as bare text.
   // dimensions must match the actual PNG from tools/gen-og.mjs (rendered at 2x).
-  const ogDesc = `${person.role} · ${person.locality}, ${person.region}`;
+  const loc = `${person.locality}, ${person.region}`;
+  // longer than the bare role so previews and search snippets use the space
+  // well, but still Patrick's own words (role + tagline), not keyword filler.
+  // the trailing line doubles as the call-to-action link-preview tools want.
+  const ogDesc = `${person.role} · ${loc} — ${person.tagline}. tap to save my contact.`;
+  const metaDesc = `${person.name} — ${person.role} in ${loc}. ${person.tagline}. scan the qr or tap to save my contact.`;
+  const pageTitle = `${person.name} — ${person.role} · ${person.org}`;
   const ogImg = `${origin}/og/${person.handle}.png`;
   const [firstName, ...rest] = person.name.split(" ");
   const meta = `
@@ -57,8 +63,8 @@ export async function onRequestGet(context) {
 <meta property="og:url" content="${escapeHtml(cardUrl)}">
 <meta property="og:image" content="${escapeHtml(ogImg)}">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="2400">
-<meta property="og:image:height" content="1260">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${escapeHtml(person.name)} - ${escapeHtml(person.role)}">
 <meta property="profile:first_name" content="${escapeHtml(firstName)}">
 <meta property="profile:last_name" content="${escapeHtml(rest.join(" "))}">
@@ -80,8 +86,8 @@ export async function onRequestGet(context) {
 
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${escapeHtml(person.name)} - card</title>
-<meta name="description" content="${escapeHtml(person.name)} - ${escapeHtml(person.role)}">
+<title>${escapeHtml(pageTitle)}</title>
+<meta name="description" content="${escapeHtml(metaDesc)}">
 <meta name="theme-color" content="#0f1113">${meta}
 <link rel="icon" href="/favicon.svg">
 <link rel="stylesheet" href="/hartforge.css">
